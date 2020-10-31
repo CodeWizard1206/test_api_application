@@ -3,7 +3,13 @@ import 'package:flutter/material.dart';
 class InputField extends StatelessWidget {
   final String title;
   final TextEditingController controller;
-  const InputField({Key key, this.title, this.controller}) : super(key: key);
+  final TextInputType keyboardType;
+  const InputField(
+      {Key key,
+      this.title,
+      this.controller,
+      this.keyboardType = TextInputType.text})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -12,24 +18,17 @@ class InputField extends StatelessWidget {
       padding: const EdgeInsets.all(
         6.0,
       ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        mainAxisAlignment: MainAxisAlignment.center,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          Container(
-            child: TextFormField(
-              controller: controller,
-              decoration: InputDecoration(
-                labelText: title,
-                hintText: title,
-                // enabledBorder: inputBoxStyle,
-                // focusedBorder: inputBoxStyle,
-              ),
-              maxLines: 1,
-            ),
-          ),
-        ],
+      child: TextFormField(
+        cursorColor: Colors.teal,
+        controller: controller,
+        keyboardType: keyboardType,
+        decoration: InputDecoration(
+          labelText: title,
+          hintText: title,
+          // enabledBorder: inputBoxStyle,
+          // focusedBorder: inputBoxStyle,
+        ),
+        maxLines: 1,
       ),
     );
   }

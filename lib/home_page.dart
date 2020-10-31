@@ -21,6 +21,7 @@ class _HomePageState extends State<HomePage> {
   TextEditingController _nameController;
   TextEditingController _salaryController;
   TextEditingController _ageController;
+  BuildContext _context;
 
   @override
   void initState() {
@@ -59,7 +60,7 @@ class _HomePageState extends State<HomePage> {
   }
 
   Future<Map<String, dynamic>> postData(
-      BuildContext context, String name, String salary, String age) async {
+      String name, String salary, String age) async {
     final Response response = await post(
       'http://dummy.restapiexample.com/api/v1/create',
       body: {
@@ -92,7 +93,7 @@ class _HomePageState extends State<HomePage> {
       setState(() {
         showLoader = false;
       });
-      Scaffold.of(context).showSnackBar(
+      Scaffold.of(_context).showSnackBar(
         SnackBar(
           content: Text('Error, Status Code : $code!'),
         ),
@@ -110,7 +111,7 @@ class _HomePageState extends State<HomePage> {
         valueColor: AlwaysStoppedAnimation(Colors.teal),
       ),
       child: Scaffold(
-        resizeToAvoidBottomPadding: true,
+        // resizeToAvoidBottomPadding: true,
         appBar: AppBar(
           title: Text(
             'Test API Application',
@@ -148,7 +149,13 @@ class _HomePageState extends State<HomePage> {
                 ),
                 Builder(
                   builder: (context) => MaterialButton(
-                    onPressed: () => inputForm(context), //postRequest(context),
+                    onPressed: () {
+                      _context = context;
+                      _nameController.text = '';
+                      _salaryController.text = '';
+                      _ageController.text = '';
+                      inputForm(context); //postRequest(context),
+                    },
                     child: Text(
                       'POST',
                       style: TextStyle(
@@ -195,15 +202,18 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
-  void postRequest(BuildContext context) async {
+  void postRequest() async {
     setState(() {
       showLoader = true;
     });
-    Map<String, dynamic> gotData =
-        await postData(context, 'Charles Xavier', '32000', '21');
+    Map<String, dynamic> gotData = await postData(
+      _nameController.text,
+      _salaryController.text,
+      _ageController.text,
+    );
     if (gotData != null) {
       showModalBottomSheet(
-        context: context,
+        context: _context,
         isScrollControlled: true,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.only(
@@ -211,9 +221,9 @@ class _HomePageState extends State<HomePage> {
             topRight: Radius.circular(6.0),
           ),
         ),
-        builder: (context) => Container(
+        builder: (_context) => Container(
           height: 130.0,
-          width: MediaQuery.of(context).size.width,
+          width: MediaQuery.of(_context).size.width,
           child: Column(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
@@ -270,35 +280,79 @@ class _HomePageState extends State<HomePage> {
       builder: (context) {
         return Wrap(
           children: [
-            Column(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                InputField(
-                  title: 'Name',
-                  controller: _nameController,
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    Expanded(
-                      flex: 1,
-                      child: InputField(
-                        title: 'Age',
-                        controller: _ageController,
+            Container(
+              padding: const EdgeInsets.symmetric(
+                horizontal: 5.0,
+              ),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  InputField(
+                    title: 'Name',
+                    controller: _nameController,
+                  ),
+                  AnimatedPadding(
+                    duration: Duration(
+                      milliseconds: 200,
+                    ),
+                    padding: EdgeInsets.only(
+                      bottom: MediaQuery.of(context).viewInsets.bottom != 0
+                          ? MediaQuery.of(context).viewInsets.bottom - 45
+                          : 8,
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        Expanded(
+                          flex: 1,
+                          child: InputField(
+                            keyboardType: TextInputType.number,
+                            title: 'Age',
+                            controller: _ageController,
+                          ),
+                        ),
+                        Expanded(
+                          flex: 3,
+                          child: InputField(
+                            keyboardType: TextInputType.number,
+                            title: 'Salary',
+                            controller: _salaryController,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: MaterialButton(
+                      onPressed: () {
+                        if (_nameController.text != '' &&
+                            _salaryController.text != '' &&
+                            _ageController.text != '') {
+                          postRequest();
+                          Navigator.of(context).pop();
+                        }
+                      },
+                      child: Text(
+                        'POST DATA',
+                        style: TextStyle(
+                          fontSize: 18.0,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      elevation: 5.0,
+                      color: Colors.teal,
+                      padding: const EdgeInsets.symmetric(
+                        vertical: 10.0,
+                        horizontal: 14.0,
                       ),
                     ),
-                    Expanded(
-                      flex: 3,
-                      child: InputField(
-                        title: 'Salary',
-                        controller: _salaryController,
-                      ),
-                    ),
-                  ],
-                ),
-              ],
+                  ),
+                  SizedBox(height: 4),
+                ],
+              ),
             ),
           ],
         );
