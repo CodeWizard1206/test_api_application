@@ -4,6 +4,7 @@ import 'package:http/http.dart';
 import 'package:modal_progress_hud/modal_progress_hud.dart';
 import 'package:test_api_application/components/employee_list.dart';
 import 'package:test_api_application/components/info_box.dart';
+import 'package:test_api_application/components/input_field.dart';
 import 'package:test_api_application/components/profile_thumb.dart';
 import 'package:test_api_application/employeeData.dart';
 
@@ -17,6 +18,17 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   List<EmployeeData> data = List<EmployeeData>();
   bool showLoader = false;
+  TextEditingController _nameController;
+  TextEditingController _salaryController;
+  TextEditingController _ageController;
+
+  @override
+  void initState() {
+    super.initState();
+    _nameController = TextEditingController();
+    _salaryController = TextEditingController();
+    _ageController = TextEditingController();
+  }
 
   Future<bool> getData(BuildContext context) async {
     Response response =
@@ -98,6 +110,7 @@ class _HomePageState extends State<HomePage> {
         valueColor: AlwaysStoppedAnimation(Colors.teal),
       ),
       child: Scaffold(
+        resizeToAvoidBottomPadding: true,
         appBar: AppBar(
           title: Text(
             'Test API Application',
@@ -135,7 +148,7 @@ class _HomePageState extends State<HomePage> {
                 ),
                 Builder(
                   builder: (context) => MaterialButton(
-                    onPressed: () => postRequest(context),
+                    onPressed: () => inputForm(context), //postRequest(context),
                     child: Text(
                       'POST',
                       style: TextStyle(
@@ -242,5 +255,54 @@ class _HomePageState extends State<HomePage> {
         ),
       );
     }
+  }
+
+  void inputForm(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(10.0),
+          topRight: Radius.circular(10.0),
+        ),
+      ),
+      builder: (context) {
+        return Wrap(
+          children: [
+            Column(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                InputField(
+                  title: 'Name',
+                  controller: _nameController,
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Expanded(
+                      flex: 1,
+                      child: InputField(
+                        title: 'Age',
+                        controller: _ageController,
+                      ),
+                    ),
+                    Expanded(
+                      flex: 3,
+                      child: InputField(
+                        title: 'Salary',
+                        controller: _salaryController,
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ],
+        );
+      },
+    );
   }
 }

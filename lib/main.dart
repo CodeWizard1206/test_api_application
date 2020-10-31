@@ -15,7 +15,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Test API Application',
-      theme: (DateTime.now().hour <= 15 && DateTime.now().hour >= 6)
+      theme: (DateTime.now().hour <= 18 && DateTime.now().hour >= 6)
           ? ThemeData.light()
           : ThemeData.dark(),
       routes: {
